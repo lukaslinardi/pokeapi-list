@@ -1,14 +1,19 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+//import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+// import reactLogo from "./assets/react.svg";
+// import viteLogo from "/vite.svg";
+import PokeList from "../src/components/PokeList";
 
 function App() {
-  const [count, setCount] = useState(0);
+  //const [count, setCount] = useState(0);
 
   return (
-    <>
-      <div>
+    <div>
+      <Routes>
+        <Route path="/" element={<Navigate to="/poke-list" />} />
+        <Route path="/poke-list" element={<PokeList />} />
+        {/*
+<div>
         <a href="https://vitejs.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
@@ -31,7 +36,10 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-    </>
+
+          */}{" "}
+      </Routes>
+    </div>
   );
 }
 
