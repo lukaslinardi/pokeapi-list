@@ -1,16 +1,24 @@
 import { useState, useEffect } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { CircularProgress } from "@mui/material";
+import {
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
 
 import { getPokemons, getPokemonDetail } from "../services/poke-api";
 import { PokeListResult, Result, Types, PokemonType } from "../types/pokelist";
 import { backgroundType } from "../utils/constants";
+import PokeDetail from "./PokeDetail";
 
 const FETCH_LIMIT = 10;
 
 const PokeList = () => {
   const [offset, setOffset] = useState(0);
   const [limit, setLimit] = useState(FETCH_LIMIT);
+  const [openModal, setOpenModal] = useState(false);
+  const [pokeId, setPokeId] = useState("");
 
   // const { data: pokeListData, isLoading } = useQuery({
   //   queryKey: ["poke-list", offset, limit],
@@ -26,10 +34,18 @@ const PokeList = () => {
     queryKey: ["poke-list", limit],
     queryFn: ({ pageParam = 0 }) => getPokemons(pageParam),
     getNextPageParam: (lastPage, allPage) => {
-      console.log("this is allPage length", allPage.length);
       return allPage.length + 10;
     },
   });
+
+  const { data: pokeDetailData } = useQuery({
+    queryKey: ["poke-detail", pokeId],
+    queryFn: () => getPokemonDetail(pokeId),
+    enabled: pokeId !== "",
+  });
+
+  console.log(pokeDetailData);
+  console.log(pokeListData);
 
   return (
     <div className="p-5">
@@ -57,6 +73,11 @@ const PokeList = () => {
                     backgroundColor:
                       backgroundType[data?.buffer?.types[0]?.type?.name],
                     alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => {
+                    setOpenModal(true);
+                    setPokeId(data.buffer.id);
                   }}
                 >
                   <div className="p-2">
@@ -84,7 +105,12 @@ const PokeList = () => {
                     ))}
                   </div>
                   <div>
-                    <img src={data.buffer.sprites.front_default} />
+                    <img
+                      src={
+                        data.buffer.sprites.other["official-artwork"]
+                          ?.front_default
+                      }
+                    />
                   </div>
                 </div>
               </div>
@@ -102,6 +128,14 @@ const PokeList = () => {
       >
         {isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
       </button>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        fullWidth
+        maxWidth="md"
+      >
+        <PokeDetail pokeDetailData={pokeDetailData} />
+      </Dialog>
     </div>
   );
 };
