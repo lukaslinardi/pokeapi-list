@@ -31,23 +31,30 @@ const PokeList = () => {
     },
   });
 
-  const { data: pokeDetailData } = useQuery({
+  const { data: pokeDetailData, isLoading: isPokeDetailLoading } = useQuery({
     queryKey: ["poke-detail", pokeId],
     queryFn: () => getPokemonDetail(pokeId),
     enabled: pokeId !== "",
   });
 
-  const { data: pokeSpeciesData } = useQuery({
+  const { data: pokeSpeciesData, isLoading: isPokeSpeciesLoading } = useQuery({
     queryKey: ["poke-species", pokeId],
     queryFn: () => getPokemonSpecies(pokeId),
     enabled: pokeId !== "",
   });
 
-  const { data: pokeEvolutionData } = useQuery({
-    queryKey: ["poke-evolution", pokeEvoId],
-    queryFn: () => getPokemonEvolution(pokeEvoId),
-    enabled: pokeEvoId !== null,
-  });
+  const { data: pokeEvolutionData, isLoading: isPokeEvolutionLoading } =
+    useQuery({
+      queryKey: ["poke-evolution", pokeEvoId],
+      queryFn: () => getPokemonEvolution(pokeEvoId),
+      enabled: pokeEvoId !== null,
+    });
+
+  const isLoading =
+    isPokeDetailLoading ||
+    isPokeSpeciesLoading ||
+    isPokeEvolutionLoading ||
+    isFetchingNextPage;
 
   useEffect(() => {
     if (pokeSpeciesData && pokeSpeciesData !== undefined) {
@@ -76,10 +83,10 @@ const PokeList = () => {
               >
                 <div
                   style={{
-                    borderRadius: "0.5rem", // equivalent to rounded-lg
+                    borderRadius: "0.5rem", 
                     boxShadow:
-                      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", // equivalent to shadow-md
-                    padding: "0.75rem", // equivalent to p-3
+                      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", 
+                    padding: "0.75rem", 
                     display: "flex",
                     backgroundColor:
                       backgroundType[data?.buffer?.types[0]?.type?.name],
@@ -133,11 +140,10 @@ const PokeList = () => {
         className="text-blue-500 p-3.5 border-2 border-blue-500 rounded-md text-center mt-4 hover:bg-slate-100 w-full"
         disabled={isFetchingNextPage}
         onClick={() => {
-          //setLimit((prevValue) => prevValue + 10);
           fetchNextPage();
         }}
       >
-        {isFetchingNextPage ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
+        {isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
       </button>
       <Dialog
         open={openModal}
@@ -149,6 +155,7 @@ const PokeList = () => {
           pokeDetailData={pokeDetailData}
           pokeSpeciesData={pokeSpeciesData}
           pokeEvolutionData={pokeEvolutionData}
+          isLoading={isLoading}
         />
       </Dialog>
     </div>

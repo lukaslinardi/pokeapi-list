@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
-import { Tab, Tabs, LinearProgress } from "@mui/material";
+import { Tab, Tabs, CircularProgress } from "@mui/material";
 
 import {
   PokeDetailResult,
-  PokeDetailAbility,
   PokeSpecies,
   EvolutionChainJSON,
   Chain,
   DetailAttribute,
 } from "../types/pokelist";
 import { backgroundType } from "../utils/constants";
+import AboutTab from "./AboutTab";
+import BaseStatTab from "./BaseStatsTab";
+import EvolutionTab from "./EvolutionTab";
+import MovesTab from "./MovesTab";
 
 type Props = {
   pokeDetailData: PokeDetailResult | undefined;
   pokeSpeciesData: PokeSpecies | undefined;
   pokeEvolutionData: EvolutionChainJSON | undefined;
+  isLoading: boolean;
 };
 
 interface TabPanelProps {
@@ -47,7 +51,8 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 const PokeDetail = (props: Props) => {
-  const { pokeDetailData, pokeSpeciesData, pokeEvolutionData } = props;
+  const { pokeDetailData, pokeSpeciesData, pokeEvolutionData, isLoading } =
+    props;
 
   const [value, setValue] = useState(0);
   const [evolutionList, setEvolutionList] = useState<DetailAttribute[]>([]);
@@ -152,117 +157,29 @@ const PokeDetail = (props: Props) => {
               <Tab label="Moves" {...a11yProps(3)} />
             </Tabs>
             <CustomTabPanel index={0} value={value}>
-              <div className="flex capitalize">
-                <div>
-                  <p>Species</p>
-                  <p>Height</p>
-                  <p>Weight</p>
-                  <p>Abilites</p>
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <CircularProgress />
                 </div>
-                <div className="ml-10 font-bold">
-                  <p>
-                    {pokeSpeciesData && pokeSpeciesData !== undefined
-                      ? pokeSpeciesData.genera[7]?.genus
-                      : "Unknown Pokemon"}
-                  </p>
-                  <p>{pokeDetailData.height}</p>
-                  <p>{pokeDetailData.weight}</p>
-                  <p>
-                    {pokeDetailData.abilities.map(
-                      (data: PokeDetailAbility, index: number) => {
-                        return (
-                          <span key={index}>
-                            {index !== pokeDetailData.abilities.length - 1
-                              ? data.ability.name + ", "
-                              : data.ability.name}
-                          </span>
-                        );
-                      },
-                    )}
-                  </p>
-                </div>
-              </div>
+              ) : (
+                <AboutTab
+                  pokeDetailData={pokeDetailData}
+                  pokeSpeciesData={pokeSpeciesData}
+                />
+              )}
             </CustomTabPanel>
             <CustomTabPanel index={1} value={value}>
-              <div className="flex">
-                <div className="w-[30%] capitalize">
-                  {pokeDetailData.stats.map((data, index) => (
-                    <p key={index} className="">{data.stat.name}</p>
-                  ))}
-                </div>
-
-                <div className="w-full my-2">
-                  {pokeDetailData.stats.map((data, index) => (
-                    <div className="flex items-center" key={index}>
-                      <p className="mr-2">{data.base_stat}</p>
-                      <div
-                        className={`w-[50%] ${data.base_stat > 50 ? "text-green-500" : "text-red-500"}`}
-                      >
-                        <LinearProgress
-                          value={data.base_stat > 100 ? 100 : data.base_stat}
-                          color="inherit"
-                          variant="determinate"
-                          sx={{ width: "50%" }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <BaseStatTab pokeDetailData={pokeDetailData} />
             </CustomTabPanel>
-
             <CustomTabPanel index={2} value={value}>
-              <div className="flex justify-center">
-                {evolutionList.map((data) => (
-                  <div className="mx-2">
-                    <div className="flex justify-center ">
-                      <img
-                        style={{
-                          width: "100%",
-                          borderRadius: "9999px",
-                          backgroundColor:
-                            backgroundType[
-                              pokeDetailData && pokeDetailData !== undefined
-                                ? pokeDetailData.types[0]?.type?.name
-                                : "normal"
-                            ],
-                          padding: 10,
-                        }}
-                        src={`${import.meta.env.VITE_REACT_API_URL_PICS}${data.url}`}
-                      />
-                    </div>
-                    <p className="text-center">{data.name}</p>
-                  </div>
-                ))}
-              </div>
+              <EvolutionTab
+                pokeDetailData={pokeDetailData}
+                evolutionList={evolutionList}
+              />
             </CustomTabPanel>
-
             <CustomTabPanel index={3} value={value}>
-              <div className="grid grid-cols-2 gap-3 p-3 flex">
-                {pokeDetailData.moves
-                  .filter(
-                    (item) =>
-                      item.version_group_details[0].level_learned_at === 1,
-                  )
-                  .slice(0, 4)
-                  .map((data, index) => (
-                    <div key={index} className="flex justify-center rounded-md bg-red-500">
-                      <p className="text-center p-3 font-bold capitalize" key={index}>
-                        {data.move.name}
-                      </p>
-                    </div>
-                  ))}
-              </div>
+              <MovesTab pokeDetailData={pokeDetailData} />
             </CustomTabPanel>
-
-            {/*
-<div key={index} className="flex justify-center p-3">
-                      <p className="p-3 text-center" key={index}>
-                        {data.move.name}
-                      </p>
-                    </div>
-
-                          */}
           </div>
         </div>
       ) : null}
