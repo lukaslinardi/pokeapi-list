@@ -21,6 +21,7 @@ const PokeList = () => {
     data: pokeListData,
     fetchNextPage,
     isFetchingNextPage,
+    isLoading: isPokeListLoading
   } = useInfiniteQuery({
     initialPageParam: 0,
     queryKey: ["poke-list"],
@@ -68,96 +69,108 @@ const PokeList = () => {
   }, [pokeSpeciesData]);
 
   return (
-    <div className="p-5">
-      <p className="font-bold text-[70px] text-center">Pokemon Dex</p>
-      <div>
-        {pokeListData?.pages?.map((item: PokeListResult, index: number) => (
-          <div
-            className="flex justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full"
-            key={index}
-          >
-            {item.results.map((data, idx) => (
+    <div>
+      {isPokeListLoading ? (
+        <div className="flex justify-center">
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="p-5">
+          <p className="font-bold text-[70px] text-center">Pokemon Dex</p>
+          <div>
+            {pokeListData?.pages?.map((item: PokeListResult, index: number) => (
               <div
-                className="p-2 bg-white flex flex-wrap justify-center w-full"
-                key={idx}
+                className="flex justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full"
+                key={index}
               >
-                <div
-                  style={{
-                    borderRadius: "0.5rem", 
-                    boxShadow:
-                      "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", 
-                    padding: "0.75rem", 
-                    display: "flex",
-                    backgroundColor:
-                      backgroundType[data?.buffer?.types[0]?.type?.name],
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => {
-                    setOpenModal(true);
-                    setPokeId(data.buffer.id);
-                  }}
-                >
-                  <div className="p-2">
-                    <p className="font-bold capitalize text-white">
-                      {data.name}
-                    </p>
-                    {data.buffer?.types?.map((item: Types) => (
-                      <div key={item.type.name}>
-                        <p
-                          style={{
-                            backgroundColor: "rgba(255, 255, 255, 0.25)",
-                            borderRadius: "0.375rem",
-                            padding: "0.5rem",
-                            marginTop: "0.5rem",
-                            marginBottom: "0.5rem",
-                            textAlign: "center",
-                            color: "white",
-                            fontWeight: "bold",
-                            textTransform: "capitalize",
-                          }}
-                        >
-                          {item.type.name}
+                {item.results.map((data, idx) => (
+                  <div
+                    className="p-2 bg-white flex flex-wrap justify-center w-full"
+                    key={idx}
+                  >
+                    <div
+                      style={{
+                        borderRadius: "0.5rem",
+                        boxShadow:
+                          "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                        padding: "0.75rem",
+                        display: "flex",
+                        backgroundColor:
+                          backgroundType[data?.buffer?.types[0]?.type?.name],
+                        alignItems: "center",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setOpenModal(true);
+                        setPokeId(data.buffer.id);
+                      }}
+                    >
+                      <div className="p-2">
+                        <p className="font-bold capitalize text-white">
+                          {data.name}
                         </p>
+                        {data.buffer?.types?.map((item: Types) => (
+                          <div key={item.type.name}>
+                            <p
+                              style={{
+                                backgroundColor: "rgba(255, 255, 255, 0.25)",
+                                borderRadius: "0.375rem",
+                                padding: "0.5rem",
+                                marginTop: "0.5rem",
+                                marginBottom: "0.5rem",
+                                textAlign: "center",
+                                color: "white",
+                                fontWeight: "bold",
+                                textTransform: "capitalize",
+                              }}
+                            >
+                              {item.type.name}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                      <div>
+                        <img
+                          src={
+                            data.buffer.sprites.other["official-artwork"]
+                              ?.front_default
+                          }
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <img
-                      src={
-                        data.buffer.sprites.other["official-artwork"]
-                          ?.front_default
-                      }
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>
-      <button
-        className="text-blue-500 p-3.5 border-2 border-blue-500 rounded-md text-center mt-4 hover:bg-slate-100 w-full"
-        disabled={isFetchingNextPage}
-        onClick={() => {
-          fetchNextPage();
-        }}
-      >
-        {isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
-      </button>
-      <Dialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <PokeDetail
-          pokeDetailData={pokeDetailData}
-          pokeSpeciesData={pokeSpeciesData}
-          pokeEvolutionData={pokeEvolutionData}
-          isLoading={isLoading}
-        />
-      </Dialog>
+          <button
+            className="text-blue-500 p-3.5 border-2 border-blue-500 rounded-md text-center mt-4 hover:bg-slate-100 w-full"
+            disabled={isFetchingNextPage}
+            onClick={() => {
+              fetchNextPage();
+            }}
+          >
+            {isFetchingNextPage ? (
+              <CircularProgress />
+            ) : (
+              <p>Muat Lebih Banyak</p>
+            )}
+          </button>
+          <Dialog
+            open={openModal}
+            onClose={() => setOpenModal(false)}
+            fullWidth
+            maxWidth="sm"
+          >
+            <PokeDetail
+              pokeDetailData={pokeDetailData}
+              pokeSpeciesData={pokeSpeciesData}
+              pokeEvolutionData={pokeEvolutionData}
+              isLoading={isLoading}
+            />
+          </Dialog>
+        </div>
+      )}
     </div>
   );
 };

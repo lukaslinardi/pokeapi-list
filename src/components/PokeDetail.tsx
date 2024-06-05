@@ -14,13 +14,6 @@ import BaseStatTab from "./BaseStatsTab";
 import EvolutionTab from "./EvolutionTab";
 import MovesTab from "./MovesTab";
 
-type Props = {
-  pokeDetailData: PokeDetailResult | undefined;
-  pokeSpeciesData: PokeSpecies | undefined;
-  pokeEvolutionData: EvolutionChainJSON | undefined;
-  isLoading: boolean;
-};
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -50,9 +43,20 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
+type Props = {
+  pokeDetailData: PokeDetailResult | undefined;
+  pokeSpeciesData: PokeSpecies | undefined;
+  pokeEvolutionData: EvolutionChainJSON | undefined;
+  isLoading: boolean;
+};
+
 const PokeDetail = (props: Props) => {
-  const { pokeDetailData, pokeSpeciesData, pokeEvolutionData, isLoading } =
-    props;
+  const {
+    pokeDetailData,
+    pokeSpeciesData,
+    pokeEvolutionData,
+    isLoading,
+  } = props;
 
   const [value, setValue] = useState(0);
   const [evolutionList, setEvolutionList] = useState<DetailAttribute[]>([]);
@@ -169,16 +173,34 @@ const PokeDetail = (props: Props) => {
               )}
             </CustomTabPanel>
             <CustomTabPanel index={1} value={value}>
-              <BaseStatTab pokeDetailData={pokeDetailData} />
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <CircularProgress />
+                </div>
+              ) : (
+                <BaseStatTab pokeDetailData={pokeDetailData} />
+              )}
             </CustomTabPanel>
             <CustomTabPanel index={2} value={value}>
-              <EvolutionTab
-                pokeDetailData={pokeDetailData}
-                evolutionList={evolutionList}
-              />
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <CircularProgress />
+                </div>
+              ) : (
+                <EvolutionTab
+                  pokeDetailData={pokeDetailData}
+                  evolutionList={evolutionList}
+                />
+              )}
             </CustomTabPanel>
             <CustomTabPanel index={3} value={value}>
-              <MovesTab pokeDetailData={pokeDetailData} />
+              {isLoading ? (
+                <div className="flex justify-center">
+                  <CircularProgress />
+                </div>
+              ) : (
+                <MovesTab pokeDetailData={pokeDetailData} />
+              )}
             </CustomTabPanel>
           </div>
         </div>
