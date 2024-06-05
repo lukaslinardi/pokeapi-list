@@ -76,6 +76,7 @@ export type DetailAttribute = {
 
 export type PokeSpecies = {
   genera: PokeSpeciesDetail[];
+  evolution_chain: DetailAttribute;
 };
 
 export type PokeSpeciesDetail = {
@@ -94,4 +95,41 @@ export type PokeMovesDetail = {
 
 export type VersionDetail = {
   level_learned_at: number;
+};
+
+export type EvolutionDetails = {
+  gender: null | number;
+  held_item: null | object;
+  item: null | object;
+  known_move: null | object;
+  known_move_type: null | object;
+  location: null | object;
+  min_affection: null | number;
+  min_beauty: null | number;
+  min_happiness: null | number;
+  min_level: number;
+  needs_overworld_rain: boolean;
+  party_species: null | object;
+  party_type: null | object;
+  relative_physical_stats: null | number;
+  time_of_day: string;
+  trade_species: null | object;
+  trigger: {
+    name: string;
+    url: string;
+  };
+  turn_upside_down: boolean;
+};
+
+export type Chain = {
+  evolution_details: EvolutionDetails[];
+  evolves_to: Chain[];
+  is_baby: boolean 
+  species: DetailAttribute;
+};
+
+export type EvolutionChainJSON = {
+  baby_trigger_item: null | object;
+  chain: Chain;
+  id: number;
 };

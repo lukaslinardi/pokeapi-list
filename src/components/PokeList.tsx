@@ -1,28 +1,21 @@
 import { useState, useEffect } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import {
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-} from "@mui/material";
+import { CircularProgress, Dialog } from "@mui/material";
 
 import {
   getPokemons,
   getPokemonDetail,
   getPokemonSpecies,
+  getPokemonEvolution,
 } from "../services/poke-api";
-import { PokeListResult, Result, Types, PokemonType } from "../types/pokelist";
+import { PokeListResult, Types } from "../types/pokelist";
 import { backgroundType } from "../utils/constants";
 import PokeDetail from "./PokeDetail";
 
-const FETCH_LIMIT = 10;
-
 const PokeList = () => {
-  const [offset, setOffset] = useState(0);
-  const [limit, setLimit] = useState(FETCH_LIMIT);
   const [openModal, setOpenModal] = useState(false);
   const [pokeId, setPokeId] = useState("");
+  const [pokeEvoId, setPokeEvoId] = useState<string | null>(null);
 
   // const { data: pokeListData, isLoading } = useQuery({
   //   queryKey: ["poke-list", offset, limit],
@@ -33,12 +26,15 @@ const PokeList = () => {
     data: pokeListData,
     isLoading,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     initialPageParam: 0,
-    queryKey: ["poke-list", limit],
+    queryKey: ["poke-list"],
     queryFn: ({ pageParam = 0 }) => getPokemons(pageParam),
     getNextPageParam: (lastPage, allPage) => {
-      return allPage.length + 10;
+      // Determine if there are more pages to fetch
+      const totalFetched = allPage.length * 10;
+      return totalFetched < lastPage.count ? allPage.length : undefined;
     },
   });
 
@@ -54,15 +50,27 @@ const PokeList = () => {
     enabled: pokeId !== "",
   });
 
-  // console.log(pokeDetailData);
-  // console.log(pokeListData);
+  const { data: pokeEvolutionData } = useQuery({
+    queryKey: ["poke-evolution", pokeEvoId],
+    queryFn: () => getPokemonEvolution(pokeEvoId),
+    enabled: pokeEvoId !== null,
+  });
+
+  useEffect(() => {
+    if (pokeSpeciesData && pokeSpeciesData !== undefined) {
+      const url = pokeSpeciesData?.evolution_chain?.url;
+      const match = url?.match(/\/(\d+)\//);
+      const id = match ? match[1] : null;
+      setPokeEvoId(id);
+    } else {
+      setPokeEvoId(null);
+    }
+  }, [pokeSpeciesData]);
 
   return (
     <div className="p-5">
       <p className="font-bold text-[70px] text-center">Pokemon Dex</p>
-      <div
-      //className="flex justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full"
-      >
+      <div>
         {pokeListData?.pages?.map((item: PokeListResult, index: number) => (
           <div
             className="flex justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 w-full"
@@ -130,13 +138,13 @@ const PokeList = () => {
       </div>
       <button
         className="text-blue-500 p-3.5 border-2 border-blue-500 rounded-md text-center mt-4 hover:bg-slate-100 w-full"
-        disabled={isLoading}
+        disabled={isFetchingNextPage}
         onClick={() => {
           //setLimit((prevValue) => prevValue + 10);
           fetchNextPage();
         }}
       >
-        {isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
+        {isFetchingNextPage ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
       </button>
       <Dialog
         open={openModal}
@@ -147,6 +155,7 @@ const PokeList = () => {
         <PokeDetail
           pokeDetailData={pokeDetailData}
           pokeSpeciesData={pokeSpeciesData}
+          pokeEvolutionData={pokeEvolutionData}
         />
       </Dialog>
     </div>

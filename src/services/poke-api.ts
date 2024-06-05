@@ -1,13 +1,22 @@
 import axios from "axios";
-import { PokeListResult, Result, PokeDetailResult, PokeSpecies } from "../types/pokelist";
+import {
+  PokeListResult,
+  Result,
+  PokeDetailResult,
+  PokeSpecies,
+  EvolutionChainJSON,
+} from "../types/pokelist";
+
+const FETCH_LIMIT = 20;
 
 export const getPokemons = async (
-  pageParams: number,
+  pageParam: number,
 ): Promise<PokeListResult> => {
   try {
+    const offset = pageParam * FETCH_LIMIT;
     const config = {
       method: "GET",
-      url: `${import.meta.env.VITE_REACT_API_URL}/pokemon?limit=${pageParams}`,
+      url: `${import.meta.env.VITE_REACT_API_URL}/pokemon?limit=${FETCH_LIMIT}&offset=${offset}`,
     };
     const resAll = await axios(config);
     const pokeList: Result[] = [];
@@ -64,6 +73,22 @@ export const getPokemonSpecies = async (id: string): Promise<PokeSpecies> => {
     const config = {
       method: "GET",
       url: `${import.meta.env.VITE_REACT_API_URL}/pokemon-species/${id}`,
+    };
+
+    const res = await axios(config);
+    return res.data;
+  } catch (err: any) {
+    return err.response.data;
+  }
+};
+
+export const getPokemonEvolution = async (
+  id: string | null,
+): Promise<EvolutionChainJSON> => {
+  try {
+    const config = {
+      method: "GET",
+      url: `${import.meta.env.VITE_REACT_API_URL}/evolution-chain/${id}`,
     };
 
     const res = await axios(config);
