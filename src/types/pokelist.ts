@@ -56,6 +56,7 @@ export type PokeDetailResult = {
   stats: Stats[];
   sprites: Sprites;
   abilities: PokeDetailAbility[];
+  moves: PokeMovesDetail[];
 };
 
 export type Stats = {
@@ -71,4 +72,26 @@ export type PokeDetailAbility = {
 export type DetailAttribute = {
   name: string;
   url: string;
+};
+
+export type PokeSpecies = {
+  genera: PokeSpeciesDetail[];
+};
+
+export type PokeSpeciesDetail = {
+  genus: string;
+  language: DetailAttribute;
+};
+
+export type PokeMoves = {
+  moves: PokeMovesDetail[];
+};
+
+export type PokeMovesDetail = {
+  move: DetailAttribute;
+  version_group_details: VersionDetail[];
+};
+
+export type VersionDetail = {
+  level_learned_at: number;
 };

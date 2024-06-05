@@ -1,8 +1,8 @@
 import axios from "axios";
-import { PokeListResult, Result } from "../types/pokelist";
+import { PokeListResult, Result, PokeDetailResult, PokeSpecies } from "../types/pokelist";
 
 export const getPokemons = async (
-    pageParams: number
+  pageParams: number,
 ): Promise<PokeListResult> => {
   try {
     const config = {
@@ -43,28 +43,27 @@ export const getPokemons = async (
   }
 };
 
-// export const getPokemons = async (
-//   limit: number,
-//   offset: number,
-// ): Promise<PokeListResult> => {
-//   try {
-//     const config = {
-//       method: "GET",
-//       url: `${import.meta.env.VITE_REACT_API_URL}/pokemon?limit=${limit}&offset=${offset}`,
-//     };
-//
-//     const res = await axios(config);
-//     return res.data;
-//   } catch (err: any) {
-//     return err.response.data;
-//   }
-// };
-
-export const getPokemonDetail = async (name: string): Promise<any> => {
+export const getPokemonDetail = async (
+  name: string,
+): Promise<PokeDetailResult> => {
   try {
     const config = {
       method: "GET",
       url: `${import.meta.env.VITE_REACT_API_URL}/pokemon/${name}`,
+    };
+
+    const res = await axios(config);
+    return res.data;
+  } catch (err: any) {
+    return err.response.data;
+  }
+};
+
+export const getPokemonSpecies = async (id: string): Promise<PokeSpecies> => {
+  try {
+    const config = {
+      method: "GET",
+      url: `${import.meta.env.VITE_REACT_API_URL}/pokemon-species/${id}`,
     };
 
     const res = await axios(config);

@@ -7,7 +7,11 @@ import {
   DialogContent,
 } from "@mui/material";
 
-import { getPokemons, getPokemonDetail } from "../services/poke-api";
+import {
+  getPokemons,
+  getPokemonDetail,
+  getPokemonSpecies,
+} from "../services/poke-api";
 import { PokeListResult, Result, Types, PokemonType } from "../types/pokelist";
 import { backgroundType } from "../utils/constants";
 import PokeDetail from "./PokeDetail";
@@ -44,8 +48,14 @@ const PokeList = () => {
     enabled: pokeId !== "",
   });
 
-  console.log(pokeDetailData);
-  console.log(pokeListData);
+  const { data: pokeSpeciesData } = useQuery({
+    queryKey: ["poke-species", pokeId],
+    queryFn: () => getPokemonSpecies(pokeId),
+    enabled: pokeId !== "",
+  });
+
+  // console.log(pokeDetailData);
+  // console.log(pokeListData);
 
   return (
     <div className="p-5">
@@ -132,9 +142,12 @@ const PokeList = () => {
         open={openModal}
         onClose={() => setOpenModal(false)}
         fullWidth
-        maxWidth="md"
+        maxWidth="sm"
       >
-        <PokeDetail pokeDetailData={pokeDetailData} />
+        <PokeDetail
+          pokeDetailData={pokeDetailData}
+          pokeSpeciesData={pokeSpeciesData}
+        />
       </Dialog>
     </div>
   );

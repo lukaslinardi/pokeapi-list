@@ -5,11 +5,13 @@ import {
   PokeDetailResult,
   Ability,
   PokeDetailAbility,
+  PokeSpecies,
 } from "../types/pokelist";
 import { backgroundType } from "../utils/constants";
 
 type Props = {
-  pokeDetailData: PokeDetailResult;
+  pokeDetailData: PokeDetailResult | undefined;
+  pokeSpeciesData: PokeSpecies | undefined;
 };
 
 interface TabPanelProps {
@@ -42,28 +44,34 @@ function CustomTabPanel(props: TabPanelProps) {
 }
 
 const PokeDetail = (props: Props) => {
-  const { pokeDetailData } = props;
+  const { pokeDetailData, pokeSpeciesData } = props;
 
   const [value, setValue] = useState(0);
 
-  console.log(pokeDetailData);
+  console.log(pokeSpeciesData?.genera[7]?.genus);
 
   return (
     <div
       style={{
-        backgroundColor: backgroundType[pokeDetailData?.types[0]?.type?.name],
+        backgroundColor:
+          backgroundType[
+            pokeDetailData && pokeDetailData !== undefined
+              ? pokeDetailData.types[0]?.type?.name
+              : "normal"
+          ],
       }}
     >
       {pokeDetailData && pokeDetailData !== undefined ? (
         <div>
-          <div className="flex w-full items-center justify-between p-3">
+          <div className="flex w-full items-center justify-between p-7">
             <div>
               <p className="text-white font-bold text-[70px]">
                 {pokeDetailData.name}
               </p>
               <div className="flex">
-                {pokeDetailData.types.map((data) => (
+                {pokeDetailData.types.map((data, index: number) => (
                   <p
+                    key={index}
                     style={{
                       backgroundColor: "rgba(255, 255, 255, 0.25)",
                       borderRadius: "9999px",
@@ -104,7 +112,7 @@ const PokeDetail = (props: Props) => {
               />
             </div>
           </div>
-          <div className="bg-white rounded-t-lg h-[50%]">
+          <div className="bg-white rounded-t-lg h-[300px]">
             <Tabs value={value} onChange={(_, newValue) => setValue(newValue)}>
               <Tab label="About" {...a11yProps(0)} />
               <Tab label="Base Stats" {...a11yProps(1)} />
@@ -120,7 +128,11 @@ const PokeDetail = (props: Props) => {
                   <p>Abilites</p>
                 </div>
                 <div className="ml-7">
-                  <p>test</p>
+                  <p>
+                    {pokeSpeciesData && pokeSpeciesData !== undefined
+                      ? pokeSpeciesData.genera[7]?.genus
+                      : "Unknown Pokemon"}
+                  </p>
                   <p>{pokeDetailData.height}</p>
                   <p>{pokeDetailData.weight}</p>
                   <p>
@@ -172,7 +184,17 @@ const PokeDetail = (props: Props) => {
             </CustomTabPanel>
 
             <CustomTabPanel index={3} value={value}>
-              test3
+              {pokeDetailData.moves
+                .filter(
+                  (item) =>
+                    item.version_group_details[0].level_learned_at === 1,
+                )
+                .slice(0, 4)
+                .map((data) => (
+                  <div>
+                    <p>{data.move.name}</p>
+                  </div>
+                ))}
             </CustomTabPanel>
           </div>
         </div>
