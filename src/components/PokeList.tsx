@@ -17,14 +17,8 @@ const PokeList = () => {
   const [pokeId, setPokeId] = useState("");
   const [pokeEvoId, setPokeEvoId] = useState<string | null>(null);
 
-  // const { data: pokeListData, isLoading } = useQuery({
-  //   queryKey: ["poke-list", offset, limit],
-  //   queryFn: () => getPokemons(limit, offset),
-  // });
-
   const {
     data: pokeListData,
-    isLoading,
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
@@ -32,7 +26,6 @@ const PokeList = () => {
     queryKey: ["poke-list"],
     queryFn: ({ pageParam = 0 }) => getPokemons(pageParam),
     getNextPageParam: (lastPage, allPage) => {
-      // Determine if there are more pages to fetch
       const totalFetched = allPage.length * 10;
       return totalFetched < lastPage.count ? allPage.length : undefined;
     },
