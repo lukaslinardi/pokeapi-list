@@ -143,7 +143,7 @@ const PokeList = () => {
           fetchNextPage();
         }}
       >
-        {!isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
+        {isLoading ? <CircularProgress /> : <p>Muat Lebih Banyak</p>}
       </button>
       <Dialog
         open={openModal}
