@@ -8,6 +8,7 @@ const MovesTab = (props: Props) => {
   const { pokeDetailData } = props;
   return (
     <div>
+      <p>Moves learned when level 1</p>
       {pokeDetailData && pokeDetailData !== undefined ? (
         <div className="grid grid-cols-2 gap-3 p-3 flex">
           {pokeDetailData.moves
